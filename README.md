@@ -46,9 +46,6 @@ XGBoost churn results: recall 78% (293 of 374 churners identified), precision 52
 - They account for **$171,020 of monthly revenue**, which is **37.5%** of the total.
 - Assuming a retention campaign saved 20% of these customers, about **$34,000 per month** would be protected. This figure is an illustrative assumption, not a measured result.
 
-## Dashboard
-![Dashboard overview](powerbi/dashboard.png)
-![Retention actions](powerbi/retention_actions.png)
 
 ## Project structure
 ```

@@ -79,3 +79,21 @@ requirements.txt
 - The model was evaluated on a single train/test split. Cross-validation and threshold tuning are future work.
 - Risk thresholds (0.30 and 0.60) were chosen for simplicity and not optimized for cost.
 - Probabilities for risk scoring were computed on the full dataset, including customers the model was trained on, so they look slightly better than they would on new customers.
+
+## Dashboard
+
+![Churn retention dashboard](powerbi/dashboard.png)
+
+## Data
+
+This project uses the Telco Customer Churn dataset from Kaggle: https://www.kaggle.com/datasets/blastchar/telco-customer-churn
+
+The CSV is not included in this repository. Download it and place it in a `data/` folder to run the notebooks.
+
+## Data
+
+This project uses the Telco Customer Churn dataset from Kaggle: https://www.kaggle.com/datasets/blastchar/telco-customer-churn
+
+The CSV is not included in this repository. Download it and place it in a `data/` folder to run the notebooks.
+
+![Churn retention dashboard](powerbi/dashboard.png)

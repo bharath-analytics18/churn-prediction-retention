@@ -164,38 +164,78 @@ def suggest_actions(i, level):
     return out
 
 
-st.set_page_config(page_title="Churn Risk Predictor", page_icon="📉")
-st.title("Customer Churn Risk Predictor")
-st.caption("Enter a customer's details to estimate their chance of leaving.")
+# ------------------------- Page and design -------------------------
+st.set_page_config(page_title="Churn Risk Predictor", page_icon="📉", layout="wide")
+
+st.markdown("""
+<style>
+.block-container {padding-top: 2rem; max-width: 1100px;}
+.hero {background: linear-gradient(135deg, #1e3a8a, #3b82f6); padding: 28px 32px;
+       border-radius: 16px; color: white; margin-bottom: 24px;}
+.hero h1 {color: white; margin: 0; font-size: 2rem;}
+.hero p {margin: 6px 0 0; opacity: .9;}
+.result-card {border-radius: 16px; padding: 28px 20px; color: white; text-align: center;}
+.result-card .label {font-size: .9rem; opacity: .9; letter-spacing: .05em; text-transform: uppercase;}
+.result-card .big {font-size: 3.6rem; font-weight: 700; line-height: 1.1; margin: 6px 0;}
+.result-card .badge {display: inline-block; padding: 4px 16px; border-radius: 999px;
+                     background: rgba(255,255,255,.22); font-weight: 600;}
+.bar-bg {background: rgba(255,255,255,.3); border-radius: 999px; height: 10px; margin-top: 18px;}
+.bar-fill {background: white; height: 10px; border-radius: 999px;}
+.action {background: #f8fafc; border-left: 5px solid #3b82f6; padding: 12px 16px;
+         border-radius: 8px; margin-bottom: 10px; color: #0f172a;}
+.section-title {font-weight: 600; font-size: 1.05rem; margin-bottom: 4px;}
+</style>
+""", unsafe_allow_html=True)
+
+st.markdown("""
+<div class="hero">
+  <h1>📉 Customer Churn Risk Predictor</h1>
+  <p>Enter a customer's details to see their chance of leaving and what to do about it.</p>
+</div>
+""", unsafe_allow_html=True)
 
 with st.form("customer"):
-    c1, c2 = st.columns(2)
-    with c1:
-        gender = st.selectbox("Gender", ["Female", "Male"])
-        senior = st.selectbox("Senior citizen", ["No", "Yes"])
-        partner = st.selectbox("Partner", ["No", "Yes"])
-        dependents = st.selectbox("Dependents", ["No", "Yes"])
-        tenure = st.slider("Tenure (months)", 0, 72, 12)
-        contract = st.selectbox("Contract", ["Month-to-month", "One year", "Two year"])
-        paperless = st.selectbox("Paperless billing", ["Yes", "No"])
-        payment = st.selectbox("Payment method", [
-            "Electronic check", "Mailed check",
-            "Bank transfer (automatic)", "Credit card (automatic)"])
-        monthly = st.number_input("Monthly charges ($)", 0.0, 200.0, 70.0, step=1.0)
-        total = st.number_input("Total charges ($), 0 to estimate", 0.0, 10000.0, 0.0, step=10.0)
-    with c2:
-        phone = st.selectbox("Phone service", ["Yes", "No"])
-        multi = st.selectbox("Multiple lines", ["No", "Yes"])
-        internet = st.selectbox("Internet service", ["Fiber optic", "DSL", "No"])
-        security = st.selectbox("Online security", ["No", "Yes"])
-        backup = st.selectbox("Online backup", ["No", "Yes"])
-        device = st.selectbox("Device protection", ["No", "Yes"])
-        tech = st.selectbox("Tech support", ["No", "Yes"])
-        tv = st.selectbox("Streaming TV", ["No", "Yes"])
-        movies = st.selectbox("Streaming movies", ["No", "Yes"])
-    submitted = st.form_submit_button("Predict churn risk")
+    c1, c2, c3 = st.columns(3)
 
-if submitted:
+    with c1:
+        with st.container(border=True):
+            st.markdown('<div class="section-title">👤 Customer</div>', unsafe_allow_html=True)
+            gender = st.selectbox("Gender", ["Female", "Male"])
+            senior = st.selectbox("Senior citizen", ["No", "Yes"])
+            partner = st.selectbox("Partner", ["No", "Yes"])
+            dependents = st.selectbox("Dependents", ["No", "Yes"])
+            tenure = st.slider("Tenure (months)", 0, 72, 12)
+
+    with c2:
+        with st.container(border=True):
+            st.markdown('<div class="section-title">📡 Services</div>', unsafe_allow_html=True)
+            phone = st.selectbox("Phone service", ["Yes", "No"])
+            multi = st.selectbox("Multiple lines", ["No", "Yes"])
+            internet = st.selectbox("Internet service", ["Fiber optic", "DSL", "No"])
+            security = st.selectbox("Online security", ["No", "Yes"])
+            backup = st.selectbox("Online backup", ["No", "Yes"])
+            device = st.selectbox("Device protection", ["No", "Yes"])
+            tech = st.selectbox("Tech support", ["No", "Yes"])
+            tv = st.selectbox("Streaming TV", ["No", "Yes"])
+            movies = st.selectbox("Streaming movies", ["No", "Yes"])
+
+    with c3:
+        with st.container(border=True):
+            st.markdown('<div class="section-title">💳 Billing</div>', unsafe_allow_html=True)
+            contract = st.selectbox("Contract", ["Month-to-month", "One year", "Two year"])
+            paperless = st.selectbox("Paperless billing", ["Yes", "No"])
+            payment = st.selectbox("Payment method", [
+                "Electronic check", "Mailed check",
+                "Bank transfer (automatic)", "Credit card (automatic)"])
+            monthly = st.number_input("Monthly charges ($)", 0.0, 200.0, 70.0, step=1.0)
+            total = st.number_input("Total charges ($), 0 to estimate", 0.0, 10000.0, 0.0, step=10.0)
+
+    submitted = st.form_submit_button("Predict churn risk", type="primary",
+                                      use_container_width=True)
+
+if not submitted:
+    st.info("Fill in the details above and click **Predict churn risk**.")
+else:
     if total == 0:
         total = float(tenure * monthly)  # estimate when not provided
     inputs = {
@@ -210,14 +250,20 @@ if submitted:
     }
     prob = float(model.predict_proba(build_features(inputs))[0, 1])
     level = risk_level(prob)
+    color = {"High": "#dc2626", "Medium": "#f59e0b", "Low": "#16a34a"}[level]
 
-    st.subheader("Result")
-    m1, m2 = st.columns(2)
-    m1.metric("Churn probability", f"{prob:.1%}")
-    m2.metric("Risk level", level)
-    st.progress(min(prob, 1.0))
-
-    st.subheader("Suggested actions")
-    for a in suggest_actions(inputs, level):
-        st.write(f"- {a}")
-        
+    left, right = st.columns([1, 1.4])
+    with left:
+        st.markdown(f"""
+        <div class="result-card" style="background:{color};">
+          <div class="label">Churn probability</div>
+          <div class="big">{prob:.1%}</div>
+          <div class="badge">{level} risk</div>
+          <div class="bar-bg"><div class="bar-fill" style="width:{min(prob, 1.0) * 100:.0f}%"></div></div>
+        </div>
+        """, unsafe_allow_html=True)
+    with right:
+        st.markdown("#### Suggested actions")
+        for a in suggest_actions(inputs, level):
+            a = a.replace("**", "<b>", 1).replace("**", "</b>", 1)
+            st.markdown(f'<div class="action">{a}</div>', unsafe_allow_html=True)

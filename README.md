@@ -86,3 +86,8 @@ This project uses the Telco Customer Churn dataset from Kaggle: https://www.kagg
 The CSV is not included in this repository. Download it and place it in a `data/` folder to run the notebooks.
 
 ![Churn retention dashboard](powerbi/dashboard.png)
+
+**Live app:** https://bharath-churn-predictor.streamlit.app/
+
+Run locally: `streamlit run app.py`
+
